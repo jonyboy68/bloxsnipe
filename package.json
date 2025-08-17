@@ -1,0 +1,23 @@
+{
+  "name": "bloxsnipe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonyboy68/bloxsnipe.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jonyboy68/bloxsnipe/issues"
+  },
+  "homepage": "https://github.com/jonyboy68/bloxsnipe#readme",
+  "dependencies": {
+    "firebase-admin": "^13.4.0"
+  }
+}
