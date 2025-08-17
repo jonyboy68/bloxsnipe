@@ -1,4 +1,4 @@
-// functions/getData.js
+// functions/data.js
 const admin = require('firebase-admin');
 
 // Initialize Firebase Admin SDK using the environment variable
@@ -10,8 +10,13 @@ const db = admin.firestore();
 
 exports.handler = async (event, context) => {
   try {
-    const snapshot = await db.collection('your_collection').get();
+    // Get the collection name from the query parameters, default to "Snipes"
+    const collectionName = event.queryStringParameters.collection || 'Snipes';
+
+    // Fetch data from the specified collection
+    const snapshot = await db.collection(collectionName).get();
     const data = snapshot.docs.map(doc => doc.data());
+
     return {
       statusCode: 200,
       body: JSON.stringify(data)
@@ -19,7 +24,7 @@ exports.handler = async (event, context) => {
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to retrieve data' })
+      body: JSON.stringify({ error: `Failed to retrieve data from collection: ${collectionName}` })
     };
   }
 };

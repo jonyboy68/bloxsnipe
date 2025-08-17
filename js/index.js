@@ -628,3 +628,33 @@
                 }
             });
         });
+
+        async function fetchDataFromFirebase() {
+  try {
+    // Make a fetch request to your Netlify function endpoint
+    const response = await fetch('/.netlify/functions/data');
+
+    // Check if the response was successful
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // Parse the JSON data from the function's response
+    const data = await response.json();
+
+    // Log the data to the browser's console
+    console.log('Data received from the server:', data);
+
+    // You can now use this 'data' to update your HTML page
+    // For example, display the data in a list or table
+    // For now, let's just show a success message
+    document.body.innerHTML += '<p>Data fetched successfully! Check the console.</p>';
+
+  } catch (error) {
+    console.error('There was a problem with the fetch operation:', error);
+    document.body.innerHTML += '<p style="color: red;">Failed to fetch data. Check the console for errors.</p>';
+  }
+}
+
+// Call the function when the page loads
+window.addEventListener('load', fetchDataFromFirebase);
