@@ -42,25 +42,40 @@
     </div>
 
     <script>
+    function getSnipeDocIdFromPath() {
+        // Matches /snipe/{docId} (with or without trailing slash)
+        const match = window.location.pathname.match(/^\/snipe\/([\w-]+)\/?$/);
+        return match ? match[1] : null;
+    }
+
     async function fetchSnipesData() {
-        try {
-            const response = await fetch('/.netlify/functions/data?collection=Snipes');
-            const snipes = await response.json();
-            const output = document.getElementById('snipes-data-output');
-            if (!Array.isArray(snipes) || snipes.length === 0) {
-                output.innerHTML = '<span style="color:#ef4444">No snipes data found.</span>';
-                return;
+        const docId = getSnipeDocIdFromPath();
+        const output = document.getElementById('snipes-data-output');
+        if (docId) {
+            // Only show this terminal if on /snipe/{docId}
+            document.getElementById('snipes-terminal').style.display = '';
+            try {
+                const response = await fetch(`/.netlify/functions/data?collection=Snipes&id=${encodeURIComponent(docId)}`);
+                if (!response.ok) throw new Error('Not found');
+                const doc = await response.json();
+                if (!doc || Object.keys(doc).length === 0) {
+                    output.innerHTML = `<span style="color:#ef4444">No snipe data found for ID: ${docId}</span>`;
+                    return;
+                }
+                output.innerHTML = `
+                    <div style="margin-bottom: 7px;">
+                        <span style="color:#a3e635">[${docId}]</span> 
+                        <span style="color:#f472b6">EstimatedTime:</span> <span>${doc.EstimatedTime ?? '-'}</span> |
+                        <span style="color:#38bdf8">Progress:</span> <span>${doc.Progress ?? '-'}</span> |
+                        <span style="color:#fbbf24">Status:</span> <span>${doc.Status ?? '-'}</span>
+                    </div>
+                `;
+            } catch (err) {
+                output.innerHTML = `<span style="color:#ef4444">Error loading snipe data for ID: ${docId}</span>`;
             }
-            output.innerHTML = snipes.map((doc, idx) => `
-                <div style="margin-bottom: 7px;">
-                    <span style="color:#a3e635">[${idx+1}]</span> 
-                    <span style="color:#f472b6">EstimatedTime:</span> <span>${doc.EstimatedTime ?? '-'}</span> |
-                    <span style="color:#38bdf8">Progress:</span> <span>${doc.Progress ?? '-'}</span> |
-                    <span style="color:#fbbf24">Status:</span> <span>${doc.Status ?? '-'}</span>
-                </div>
-            `).join('');
-        } catch (err) {
-            document.getElementById('snipes-data-output').innerHTML = '<span style="color:#ef4444">Error loading snipes data.</span>';
+        } else {
+            // Hide terminal if not on /snipe/{docId}
+            document.getElementById('snipes-terminal').style.display = 'none';
         }
     }
     window.addEventListener('DOMContentLoaded', fetchSnipesData);
